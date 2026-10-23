@@ -97,8 +97,9 @@ body.tetap-terbuka .topbar{opacity:1;visibility:visible;transition:opacity .45s 
 .mata::after{content:"";width:9px;height:9px;border-radius:50%;
   background:rgba(242,236,222,.9);box-shadow:0 0 0 4px rgba(192,59,33,.30)}
 /* tulisan alamat di amplop - memudar saat dibuka */
-.tulis-amplop{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);z-index:6;
-  font:italic 500 clamp(.85rem,2.6vw,1.02rem)/1.3 var(--fs);color:var(--ink-60);white-space:nowrap;
+.tulis-amplop{position:absolute;left:50%;bottom:8%;transform:translateX(-50%);z-index:6;
+  font:italic 500 clamp(.8rem,2.4vw,.98rem)/1.3 var(--fs);color:var(--ink-60);
+  white-space:nowrap;text-align:center;padding:0 6px;
   transition:opacity .3s ease .1s}
 .amplop.buka .tulis-amplop{opacity:0}
 /* klik → tutup terbuka, kertas terangkat */
@@ -106,8 +107,9 @@ body.tetap-terbuka .topbar{opacity:1;visibility:visible;transition:opacity .45s 
 .amplop.buka .mata{opacity:0}
 .amplop.buka .lembar{transform:translateY(-74%)}
 /* hint di bawah amplop */
-.amplop-hint{font:500 9.5px var(--fm);letter-spacing:.32em;text-transform:lowercase;
-  color:var(--ink-60);transition:opacity .3s}
+.amplop-hint{font:500 10.5px var(--fm);letter-spacing:.26em;text-transform:lowercase;
+  color:var(--ink);opacity:.75;transition:opacity .3s;padding:6px 10px;border-radius:999px;
+  background:rgba(252,248,237,.7);border:1px solid var(--ui-line)}
 .intro.dibuka .amplop-hint{opacity:0}
 .intro.pergi{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .3s ease,visibility 0s .32s}
 
@@ -348,6 +350,16 @@ footer a{color:var(--ink-60);text-decoration:none;border-bottom:1px solid var(--
   padding-bottom:2px;transition:color .2s,border-color .2s}
 footer a:hover{color:var(--red);border-color:var(--red)}
 
+/* aman untuk notch & bilah bawah HP */
+@supports (padding: max(0px)){
+  .intro{padding-top:max(20px,env(safe-area-inset-top));padding-bottom:max(20px,env(safe-area-inset-bottom))}
+  .topbar{padding-top:max(11px,env(safe-area-inset-top));padding-left:max(26px,env(safe-area-inset-left));
+    padding-right:max(26px,env(safe-area-inset-right))}
+  @media(max-width:640px){.topbar{padding-left:max(14px,env(safe-area-inset-left));
+    padding-right:max(14px,env(safe-area-inset-right))}}
+  .cek-row{padding-bottom:max(26px,env(safe-area-inset-bottom))}
+}
+
 /* aksesibilitas: hormati preferensi gerak minimal */
 @media (prefers-reduced-motion:reduce){
   .amplop-layar{perspective:none}
@@ -380,7 +392,7 @@ footer a:hover{color:var(--red);border-color:var(--red)}
       <i class="tutup"></i>
       <i class="mata"></i>
     </span>
-    <span class="tulis-amplop">Kepada: Sekolah Kita<span style="display:block;font:500 8.5px var(--fm);letter-spacing:.3em;text-transform:uppercase;color:var(--red);margin-top:5px">GERAKAN ASPIRASI SISWA</span></span>
+    <span class="tulis-amplop">Kepada: Sekolah Kita<span style="display:block;font:500 8px var(--fm);letter-spacing:.24em;text-transform:uppercase;color:var(--red);margin-top:5px">GERAKAN ASPIRASI SISWA</span></span>
   </button>
   <span class="amplop-hint" id="amplopHint" aria-hidden="true">klik untuk membuka</span>
 </div>
