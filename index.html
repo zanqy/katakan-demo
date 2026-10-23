@@ -62,27 +62,28 @@ body.tetap-terbuka .topbar{opacity:1;visibility:visible;transition:opacity .45s 
 .amplop-layar{display:block;position:relative;width:100%;height:100%;perspective:700px;pointer-events:none;
   filter:drop-shadow(0 22px 32px rgba(24,20,16,.30))}
 .amplop i{display:block}
-/* badan dalam amplop — interior gelap, muncul saat mulut terbuka */
-.badan{position:absolute;inset:0;z-index:1;background:#D9C9A4;border-radius:8px;
-  box-shadow:inset 0 0 0 1px rgba(34,29,21,.40)}
-/* lembar surat di dalam — kontras dgn interior */
-.lembar{position:absolute;left:6%;right:6%;top:8%;bottom:8%;z-index:2;
+/* lembar surat: di belakang panel depan - hanya yang keluar dari amplop yang terlihat */
+.lembar{position:absolute;left:5%;right:5%;top:7%;bottom:7%;z-index:2;
   background:#FCF8ED;border:1px solid rgba(34,29,21,.32);border-radius:3px;
-  display:flex;align-items:flex-start;justify-content:center;padding-top:9%;
-  transition:transform .65s cubic-bezier(.2,.85,.3,1) .40s;
+  display:flex;align-items:flex-start;justify-content:center;padding-top:10%;
+  transition:transform .65s cubic-bezier(.2,.85,.3,1) .42s;
   box-shadow:0 4px 12px -6px rgba(24,20,16,.35)}
 .lembar i{font:italic 400 clamp(.78rem,2.4vw,.92rem)/1 var(--fs);color:var(--ink-60)}
-/* panel depan amplop: mulut (V) tertutup → terbuka via morph clip-path */
-.tutup{position:absolute;left:0;right:0;top:0;height:74%;z-index:3;
-  background:linear-gradient(160deg,#EFE6D2,#EADFC4);
-  clip-path:polygon(0 3%, 50% 26%, 100% 3%, 100% 100%, 0 100%);
+/* panel depan amplop: rect penuh, menutupi kertas */
+.badan{position:absolute;inset:0;z-index:3;
+  background:linear-gradient(160deg,#EFE6D2,#E8DCC0);border-radius:8px;
+  box-shadow:inset 0 0 0 1px rgba(34,29,21,.42), inset 0 -14px 24px -18px rgba(24,20,16,.4)}
+/* flap atas yang membuka (rotateX) — khas amplop */
+.tutup{position:absolute;left:0;right:0;top:0;height:52%;z-index:4;
+  background:linear-gradient(180deg,#E6D7B4,#DECDA6);
+  clip-path:polygon(0 0, 100% 0, 50% 96%);
   border-top-left-radius:8px;border-top-right-radius:8px;
-  transition:clip-path .55s cubic-bezier(.55,0,.3,1);
-  filter:drop-shadow(0 -1.5px 0 rgba(34,29,21,.32))}
-.amplop.buka .tutup{clip-path:polygon(0 72%, 50% 56%, 100% 72%, 100% 100%, 0 100%)}
-.amplop:hover .tutup{filter:drop-shadow(0 -1.5px 0 rgba(34,29,21,.32)) brightness(1.035)}
-/* segel lilin menutup mulut */
-.mata{position:absolute;left:50%;top:24%;transform:translate(-50%,-50%);
+  transform-origin:top center;transition:transform .55s cubic-bezier(.55,0,.3,1);
+  filter:drop-shadow(0 1.5px 0 rgba(34,29,21,.35))}
+.amplop.buka .tutup{transform:rotateX(-172deg)}
+.amplop:hover .tutup{filter:drop-shadow(0 1.5px 0 rgba(34,29,21,.35)) brightness(1.03)}
+/* segel lilin di ujung flap */
+.mata{position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);
   width:30px;height:30px;border-radius:50%;background:var(--red);z-index:5;
   box-shadow:0 3px 10px rgba(140,47,29,.45), inset 0 -2px 0 rgba(94,29,17,.55), inset 0 2px 0 rgba(242,236,222,.25);
   display:flex;align-items:center;justify-content:center;
@@ -91,13 +92,15 @@ body.tetap-terbuka .topbar{opacity:1;visibility:visible;transition:opacity .45s 
 .amplop:active .mata{transform:translate(-50%,-50%) scale(.94)}
 .mata::after{content:"";width:9px;height:9px;border-radius:50%;
   background:rgba(242,236,222,.9);box-shadow:0 0 0 4px rgba(192,59,33,.30)}
-/* tulisan di amplop */
+/* tulisan alamat di amplop - memudar saat dibuka */
 .tulis-amplop{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);z-index:6;
-  font:italic 500 clamp(.85rem,2.6vw,1.02rem)/1.3 var(--fs);color:var(--ink-60);white-space:nowrap}
+  font:italic 500 clamp(.85rem,2.6vw,1.02rem)/1.3 var(--fs);color:var(--ink-60);white-space:nowrap;
+  transition:opacity .3s ease .1s}
+.amplop.buka .tulis-amplop{opacity:0}
 /* klik → tutup terbuka, kertas terangkat */
 .amplop.buka .tutup{transform:rotateX(-176deg)}
 .amplop.buka .mata{opacity:0}
-.amplop.buka .lembar{transform:translateY(-60%);z-index:5}
+.amplop.buka .lembar{transform:translateY(-74%)}
 /* hint di bawah amplop */
 .amplop-hint{font:500 9.5px var(--fm);letter-spacing:.32em;text-transform:lowercase;
   color:var(--ink-60);transition:opacity .3s}
