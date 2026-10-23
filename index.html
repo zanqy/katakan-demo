@@ -197,8 +197,12 @@ main{max-width:980px;margin:0 auto;padding:0 22px}
   border-right:1px solid rgba(34,29,21,.35);border-top:1px solid rgba(34,29,21,.35);transform:rotate(45deg)}
 .env-peek.open .env-ask{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0)}
 @media(max-width:640px){
-  .env-ask{right:auto;left:0;bottom:auto;top:-6px;transform-origin:bottom left}
-  .env-ask::after{right:auto;left:-7px;border-right:0;border-left:1px solid rgba(34,29,21,.35)}
+  /* dialog membuka ke KIRI amplop — tidak lagi terpotong tepi kanan layar */
+  .env-ask{right:calc(100% + 14px);left:auto;bottom:-24px;top:auto;
+    width:min(250px,calc(100vw - 64px));transform-origin:bottom right}
+  .env-peek .env-hint{left:auto;right:0;transform:translateY(-100%)}
+  .env-peek:hover .env-hint,.env-peek.open .env-hint{transform:translateY(-110%)}
+  .env-label{right:auto;left:-4px;text-align:left}
 }
 .env-ask-t{font:600 11.5px var(--fm);letter-spacing:.04em;color:var(--ink);margin-bottom:6px}
 .env-ask-t b{color:var(--red);font-weight:600}
