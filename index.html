@@ -62,29 +62,27 @@ body.tetap-terbuka .topbar{opacity:1;visibility:visible;transition:opacity .45s 
 .amplop-layar{display:block;position:relative;width:100%;height:100%;perspective:700px;pointer-events:none;
   filter:drop-shadow(0 22px 32px rgba(24,20,16,.30))}
 .amplop i{display:block}
-/* lembar kertas ber_addresses di dalam amplop */
-.lembar{position:absolute;left:12%;right:12%;top:12%;bottom:10%;z-index:2;
+/* badan dalam amplop — interior gelap, muncul saat mulut terbuka */
+.badan{position:absolute;inset:0;z-index:1;background:#D9C9A4;border-radius:8px;
+  box-shadow:inset 0 0 0 1px rgba(34,29,21,.40)}
+/* lembar surat di dalam — kontras dgn interior */
+.lembar{position:absolute;left:6%;right:6%;top:8%;bottom:8%;z-index:2;
   background:#FCF8ED;border:1px solid rgba(34,29,21,.32);border-radius:3px;
-  display:flex;align-items:flex-start;justify-content:center;padding-top:10%;
-  transition:transform .7s cubic-bezier(.2,.85,.3,1) .38s;
+  display:flex;align-items:flex-start;justify-content:center;padding-top:9%;
+  transition:transform .65s cubic-bezier(.2,.85,.3,1) .40s;
   box-shadow:0 4px 12px -6px rgba(24,20,16,.35)}
-.lembar i{font:italic 400 clamp(.75rem,2.4vw,.9rem)/1 var(--fs);color:var(--ink-60)}
-/* interior gelap — supaya lembar kertas terlihat kontrasnya saat buka */
-.badan{position:absolute;inset:0;z-index:1;background:#D6C59F;border-radius:8px;
-  box-shadow:inset 0 0 0 1px rgba(34,29,21,.38)}
-/* panel depan amplop — lebih terang, garis V ke segel nyata */
-.badan-v{position:absolute;left:0;right:0;bottom:0;height:46%;z-index:3;
-  background:#F0E7D1;clip-path:polygon(0 0,50% 58%,100% 0,100% 100%,0 100%);
-  filter:drop-shadow(0 -1.5px 0 rgba(34,29,21,.34))}
-/* tutup amplop — paling gelap, kontras dgn badan */
-.tutup{position:absolute;left:0;right:0;top:0;height:62%;z-index:4;
-  background:#E0CFA6;clip-path:polygon(0 0,100% 0,50% 88%);
+.lembar i{font:italic 400 clamp(.78rem,2.4vw,.92rem)/1 var(--fs);color:var(--ink-60)}
+/* panel depan amplop: mulut (V) tertutup → terbuka via morph clip-path */
+.tutup{position:absolute;left:0;right:0;top:0;height:74%;z-index:3;
+  background:linear-gradient(160deg,#EFE6D2,#EADFC4);
+  clip-path:polygon(0 3%, 50% 26%, 100% 3%, 100% 100%, 0 100%);
   border-top-left-radius:8px;border-top-right-radius:8px;
-  transform-origin:top center;transition:transform .5s cubic-bezier(.6,0,.3,1);
-  filter:drop-shadow(0 1.5px 0 rgba(34,29,21,.30))}
-.amplop:hover .tutup{filter:drop-shadow(0 1.5px 0 rgba(34,29,21,.30)) brightness(1.04)}
-/* segel lilin — jelas sebagai tombol */
-.mata{position:absolute;left:50%;top:52.5%;transform:translate(-50%,-50%);
+  transition:clip-path .55s cubic-bezier(.55,0,.3,1);
+  filter:drop-shadow(0 -1.5px 0 rgba(34,29,21,.32))}
+.amplop.buka .tutup{clip-path:polygon(0 72%, 50% 56%, 100% 72%, 100% 100%, 0 100%)}
+.amplop:hover .tutup{filter:drop-shadow(0 -1.5px 0 rgba(34,29,21,.32)) brightness(1.035)}
+/* segel lilin menutup mulut */
+.mata{position:absolute;left:50%;top:24%;transform:translate(-50%,-50%);
   width:30px;height:30px;border-radius:50%;background:var(--red);z-index:5;
   box-shadow:0 3px 10px rgba(140,47,29,.45), inset 0 -2px 0 rgba(94,29,17,.55), inset 0 2px 0 rgba(242,236,222,.25);
   display:flex;align-items:center;justify-content:center;
@@ -354,7 +352,6 @@ footer a:hover{color:var(--red);border-color:var(--red)}
     <span class="amplop-layar" aria-hidden="true">
       <i class="badan"></i>
       <i class="lembar"><i>untukmu</i></i>
-      <i class="badan-v"></i>
       <i class="tutup"></i>
       <i class="mata"></i>
     </span>
