@@ -580,7 +580,9 @@ formEl.addEventListener('submit',e=>{e.preventDefault();
  let ok=true;if(isi.length<20){$('#errIsi').textContent='Tulis setidaknya 20 karakter — suaramu layak dibaca utuh.';ok=false;}
  if(!ok){cardEl.classList.remove('shake');void cardEl.offsetWidth;cardEl.classList.add('shake');return;}
  sendBtn.disabled=true;sendBtn.querySelector('span').textContent='Menjahit suratmu…';
- fetch('/api/aspirasi',{method:'POST',headers:{'Content-Type':'application/json'},
+ const DEMO_OFF_HOST = !(['kotak-aspirasi-osis.vercel.app','localhost','127.0.0.1'].some(h=>location.hostname===h));
+ const API = DEMO_OFF_HOST ? 'https://kotak-aspirasi-osis.vercel.app/api/aspirasi' : '/api/aspirasi';
+ fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
   body:JSON.stringify({isi})})
  .then(res=>{if(!res.ok)throw new Error('server');return res.json();})
  .then(data=>{
@@ -595,7 +597,9 @@ formEl.addEventListener('submit',e=>{e.preventDefault();
   sendBtn.disabled=false;sendBtn.querySelector('span').textContent='Kirim Surat';
  })
  .catch(()=>{
-  $('#errIsi').textContent='Gagal terhubung ke server. Coba lagi nanti.';
+  $('#errIsi').innerHTML = DEMO_OFF_HOST
+    ? 'Ini halaman demo statis — pengiriman diblokir lintas-domain. Kirim asli lewat <a style="color:var(--red);text-decoration:underline" href="https://kotak-aspirasi-osis.vercel.app/">kotak-aspirasi-osis.vercel.app</a>.'
+    : 'Gagal terhubung ke server. Coba lagi nanti.';
   cardEl.classList.remove('shake');void cardEl.offsetWidth;cardEl.classList.add('shake');
   sendBtn.disabled=false;sendBtn.querySelector('span').textContent='Kirim Surat';
  });});
