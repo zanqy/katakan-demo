@@ -59,35 +59,43 @@ body.tetap-terbuka .topbar{opacity:1;visibility:visible;transition:opacity .45s 
 .amplop{position:relative;width:min(250px,60vw);aspect-ratio:7/5;border:0;background:transparent;
   cursor:pointer;padding:0;margin-top:clamp(6px,1.5vh,14px);
   -webkit-tap-highlight-color:transparent;touch-action:manipulation}
-.amplop-layar{position:relative;width:100%;height:100%;perspective:700px;pointer-events:none}
+.amplop-layar{position:relative;width:100%;height:100%;perspective:700px;pointer-events:none;
+  filter:drop-shadow(0 22px 32px rgba(24,20,16,.30))}
 .amplop i{display:block}
+/* lembar kertas ber_addresses di dalam amplop */
 .lembar{position:absolute;left:7%;right:7%;top:9%;bottom:12%;z-index:2;
-  background:var(--lembar);border:1px solid rgba(34,29,21,.28);border-radius:4px;
-  display:flex;align-items:flex-start;justify-content:center;padding-top:13%;
+  background:#FCF8ED;border:1px solid rgba(34,29,21,.32);border-radius:3px;
+  display:flex;align-items:flex-start;justify-content:center;padding-top:10%;
   transition:transform .7s cubic-bezier(.2,.85,.3,1) .38s;
-  box-shadow:0 6px 16px -8px rgba(24,20,16,.35)}
-.lembar i{font:italic 400 clamp(.78rem,2.4vw,.95rem)/1 var(--fs);color:var(--ink-40)}
-.badan{position:absolute;inset:0;z-index:1;
-  background:linear-gradient(160deg,#EFE6D2,#EAE0C9);border-radius:8px;
-  border:1px solid rgba(34,29,21,.3)}
+  box-shadow:0 4px 12px -6px rgba(24,20,16,.35)}
+.lembar i{font:italic 400 clamp(.75rem,2.4vw,.9rem)/1 var(--fs);color:var(--ink-60)}
+/* interior gelap — supaya lembar kertas terlihat kontrasnya saat buka */
+.badan{position:absolute;inset:0;z-index:1;background:#D6C59F;border-radius:8px;
+  box-shadow:inset 0 0 0 1px rgba(34,29,21,.38)}
+/* panel depan amplop — lebih terang, garis V ke segel nyata */
 .badan-v{position:absolute;left:0;right:0;bottom:0;height:52%;z-index:3;
-  background:#EDE4CF;clip-path:polygon(0 0,50% 46%,100% 0,100% 100%,0 100%);
-  filter:drop-shadow(0 -1px 0 rgba(34,29,21,.14))}
+  background:#F0E7D1;clip-path:polygon(0 0,50% 46%,100% 0,100% 100%,0 100%);
+  filter:drop-shadow(0 -1.5px 0 rgba(34,29,21,.34))}
+/* tutup amplop — paling gelap, kontras dgn badan */
 .tutup{position:absolute;left:0;right:0;top:0;height:50%;z-index:4;
-  background:#E5D9BE;clip-path:polygon(0 0,100% 0,50% 96%);
+  background:#E0CFA6;clip-path:polygon(0 0,100% 0,50% 96%);
   border-top-left-radius:8px;border-top-right-radius:8px;
   transform-origin:top center;transition:transform .5s cubic-bezier(.6,0,.3,1);
-  box-shadow:0 1px 0 rgba(34,29,21,.12)}
-.amplop:hover .tutup{filter:brightness(1.025)}
-.mata{position:absolute;left:50%;top:calc(96% - 11px);transform:translate(-50%,-50%);
-  width:19px;height:19px;border-radius:50%;background:var(--red);z-index:5;
+  filter:drop-shadow(0 1.5px 0 rgba(34,29,21,.30))}
+.amplop:hover .tutup{filter:drop-shadow(0 1.5px 0 rgba(34,29,21,.30)) brightness(1.04)}
+/* segel lilin — jelas sebagai tombol */
+.mata{position:absolute;left:50%;top:calc(96% - 14px);transform:translate(-50%,-50%);
+  width:30px;height:30px;border-radius:50%;background:var(--red);z-index:5;
+  box-shadow:0 3px 10px rgba(140,47,29,.45), inset 0 -2px 0 rgba(94,29,17,.55), inset 0 2px 0 rgba(242,236,222,.25);
   display:flex;align-items:center;justify-content:center;
-  transition:opacity .25s ease .15s}
-.mata::after{content:"";width:5.5px;height:5.5px;border-radius:50%;
-  background:rgba(242,236,222,.85);box-shadow:0 0 0 3px rgba(192,59,33,.35)}
+  transition:opacity .25s ease .15s,transform .16s ease}
+.amplop:hover .mata{transform:translate(-50%,-50%) scale(1.08)}
+.amplop:active .mata{transform:translate(-50%,-50%) scale(.94)}
+.mata::after{content:"";width:9px;height:9px;border-radius:50%;
+  background:rgba(242,236,222,.9);box-shadow:0 0 0 4px rgba(192,59,33,.30)}
 /* tulisan di amplop */
-.tulis-amplop{position:absolute;left:0;right:0;bottom:7.5%;z-index:6;
-  font:500 9px var(--fm);letter-spacing:.42em;text-transform:uppercase;color:var(--ink-60)}
+.tulis-amplop{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);z-index:6;
+  font:italic 500 clamp(.85rem,2.6vw,1.02rem)/1.3 var(--fs);color:var(--ink-60);white-space:nowrap}
 /* klik → tutup terbuka, kertas terangkat */
 .amplop.buka .tutup{transform:rotateX(-176deg)}
 .amplop.buka .mata{opacity:0}
@@ -350,7 +358,7 @@ footer a:hover{color:var(--red);border-color:var(--red)}
       <i class="tutup"></i>
       <i class="mata"></i>
     </span>
-    <span class="tulis-amplop">surat untuk sekolah</span>
+    <span class="tulis-amplop">Kepada: Sekolah Kita<span style="display:block;font:500 8.5px var(--fm);letter-spacing:.3em;text-transform:uppercase;color:var(--red);margin-top:5px">GERAKAN ASPIRASI SISWA</span></span>
   </button>
   <span class="amplop-hint" id="amplopHint" aria-hidden="true">klik untuk membuka</span>
 </div>
