@@ -12,19 +12,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
-   KATAKAN. — halaman tenang.
-   Prinsip: gerak hanya sebagai jawaban atas aksi user
-   (klik, fokus, kirim). Tidak ada gerak yang jalan sendiri.
+   KATAKAN. — surat di amplop.
+   Dua keadaan: AMPLOP TERTUTUP (intro) → KARTU TERBUKA (form).
+   Gerak hanya sebagai jawaban atas aksi user — tidak ada
+   gerak yang jalan sendiri, tidak ada mesin scroll.
    ============================================================ */
 :root{
-  --paper:#F2ECDE; --paper-2:#EDE4CF; --paper-deep:#E6EAE2;
+  --paper:#F2ECDE; --paper-2:#EDE4CF; --paper-deep:#E6EAE2; --lembar:#FBF7EC;
   --ink:#221D15; --ink-60:rgba(34,29,21,.6); --ink-40:rgba(34,29,21,.4);
   --red:#C03B21; --dark:#181410; --line:rgba(34,29,21,.16);
   --ui:rgba(34,29,21,.45); --ui-line:rgba(34,29,21,.22);
   --fd:'Fraunces',serif; --fs:'Spectral',serif; --fm:'IBM Plex Mono',monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{background:var(--paper);scroll-behavior:smooth}
+html{background:var(--paper)}
 body{background:var(--paper);color:var(--ink);font-family:var(--fs);
   -webkit-font-smoothing:antialiased;overflow-x:hidden}
 ::selection{background:var(--red);color:var(--paper)}
@@ -34,31 +35,80 @@ body{background:var(--paper);color:var(--ink);font-family:var(--fs);
 .grain{position:fixed;inset:0;pointer-events:none;z-index:200;opacity:.05;
   background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E")}
 
-/* ---------------- kerangka halaman ---------------- */
+/* bilah atas (muncul setelah amplop dibuka) */
 .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:16px;
-  padding:11px 26px;border-bottom:1px solid var(--line);
+  padding:11px 26px;border-bottom:1px solid var(--line);opacity:0;visibility:hidden;
   font:500 8.5px var(--fm);letter-spacing:.3em;color:var(--ui);text-transform:uppercase}
+body.tetap-terbuka .topbar{opacity:1;visibility:visible;transition:opacity .45s ease .1s}
 .topbar b{color:var(--ink);font-weight:500}
-@media(max-width:640px){.topbar{padding:14px 18px;font-size:8px;letter-spacing:.22em}}
+@media(max-width:640px){.topbar{padding:10px 16px;font-size:8px;letter-spacing:.2em}}
 
-main{max-width:980px;margin:0 auto;padding:0 22px}
+/* ============================================================
+   INTRO — AMPLOP TERTUTUP
+   ============================================================ */
+.intro{position:fixed;inset:0;z-index:500;background:var(--paper);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:clamp(10px,2.2vh,20px);padding:24px;text-align:center}
+.intro-kicker{font:500 10px var(--fm);letter-spacing:.34em;color:var(--ink-60);text-transform:uppercase}
+.intro-title{font-family:var(--fd);font-weight:640;line-height:.9;letter-spacing:-.015em;
+  font-size:clamp(3rem,11vw,5.6rem);color:var(--ink)}
+.intro-title .dot{color:var(--red)}
+.intro-sub{font:italic 400 clamp(.95rem,1.6vw,1.05rem)/1.6 var(--fs);color:var(--ink-60);max-width:40ch}
+
+/* amplop: badan + lembar kertas di dalam + tutup + segel */
+.amplop{position:relative;width:min(250px,60vw);aspect-ratio:7/5;border:0;background:transparent;
+  cursor:pointer;padding:0;margin-top:clamp(6px,1.5vh,14px);
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.amplop-layar{position:relative;width:100%;height:100%;perspective:700px;pointer-events:none}
+.amplop i{display:block}
+.lembar{position:absolute;left:7%;right:7%;top:9%;bottom:12%;z-index:2;
+  background:var(--lembar);border:1px solid rgba(34,29,21,.28);border-radius:4px;
+  display:flex;align-items:flex-start;justify-content:center;padding-top:13%;
+  transition:transform .7s cubic-bezier(.2,.85,.3,1) .38s;
+  box-shadow:0 6px 16px -8px rgba(24,20,16,.35)}
+.lembar i{font:italic 400 clamp(.78rem,2.4vw,.95rem)/1 var(--fs);color:var(--ink-40)}
+.badan{position:absolute;inset:0;z-index:1;
+  background:linear-gradient(160deg,#EFE6D2,#EAE0C9);border-radius:8px;
+  border:1px solid rgba(34,29,21,.3)}
+.badan-v{position:absolute;left:0;right:0;bottom:0;height:52%;z-index:3;
+  background:#EDE4CF;clip-path:polygon(0 0,50% 46%,100% 0,100% 100%,0 100%);
+  filter:drop-shadow(0 -1px 0 rgba(34,29,21,.14))}
+.tutup{position:absolute;left:0;right:0;top:0;height:50%;z-index:4;
+  background:#E5D9BE;clip-path:polygon(0 0,100% 0,50% 96%);
+  border-top-left-radius:8px;border-top-right-radius:8px;
+  transform-origin:top center;transition:transform .5s cubic-bezier(.6,0,.3,1);
+  box-shadow:0 1px 0 rgba(34,29,21,.12)}
+.amplop:hover .tutup{filter:brightness(1.025)}
+.mata{position:absolute;left:50%;top:calc(96% - 11px);transform:translate(-50%,-50%);
+  width:19px;height:19px;border-radius:50%;background:var(--red);z-index:5;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .25s ease .15s}
+.mata::after{content:"";width:5.5px;height:5.5px;border-radius:50%;
+  background:rgba(242,236,222,.85);box-shadow:0 0 0 3px rgba(192,59,33,.35)}
+/* tulisan di amplop */
+.tulis-amplop{position:absolute;left:0;right:0;bottom:7.5%;z-index:6;
+  font:500 9px var(--fm);letter-spacing:.42em;text-transform:uppercase;color:var(--ink-60)}
+/* klik → tutup terbuka, kertas terangkat */
+.amplop.buka .tutup{transform:rotateX(-176deg)}
+.amplop.buka .mata{opacity:0}
+.amplop.buka .lembar{transform:translateY(-60%);z-index:5}
+/* hint di bawah amplop */
+.amplop-hint{font:500 9.5px var(--fm);letter-spacing:.32em;text-transform:lowercase;
+  color:var(--ink-60);transition:opacity .3s}
+.intro.dibuka .amplop-hint{opacity:0}
+.intro.pergi{opacity:0;pointer-events:none;transition:opacity .35s ease}
+
+/* ============================================================
+   ISI — KARTU SURAT (setelah amplop dibuka)
+   ============================================================ */
+main{max-width:980px;margin:0 auto;padding:0 22px;opacity:0;visibility:hidden}
+main.tampak{opacity:1;visibility:visible;transition:opacity .45s ease}
 @media(max-width:640px){main{padding:0 14px}}
-
-/* momen masuk: satu kali, lalu diam */
 @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-.masthead{padding:clamp(20px,4vh,44px) 0 clamp(14px,2.2vh,22px);text-align:center;
-  animation:rise .5s cubic-bezier(.2,.8,.3,1) both}
-.kicker{font:500 10px var(--fm);letter-spacing:.34em;color:var(--ink-60);text-transform:uppercase;margin-bottom:8px}
-.title{font-family:var(--fd);font-weight:640;line-height:.9;letter-spacing:-.015em;color:var(--ink);
-  font-size:clamp(2.7rem,7.6vw,5.4rem)}
-.title .dot{color:var(--red)}
-.masthead .hero-sub{margin:10px auto 0;font:italic 400 clamp(.9rem,1.5vw,1rem)/1.6 var(--fs);
-  color:var(--ink-60);max-width:56ch}
+main.tampak .card{animation:rise .55s cubic-bezier(.2,.8,.3,1) both}
 
-/* ---------------- kartu surat ---------------- */
-.letter-wrap{padding-bottom:clamp(32px,5vh,56px);animation:rise .55s cubic-bezier(.2,.8,.3,1) .08s both}
-.card{position:relative;width:min(660px,100%);margin:0 auto;
-  background:var(--paper);border:1px solid rgba(34,29,21,.3);border-radius:14px;
+.card{position:relative;width:min(660px,100%);margin:clamp(20px,4vh,44px) auto 0;
+  background:var(--lembar);border:1px solid rgba(34,29,21,.3);border-radius:14px;
   padding:clamp(16px,3.4vw,32px) clamp(18px,5vw,42px);
   box-shadow:0 24px 60px -30px rgba(24,20,16,.35)}
 .card-head{position:relative;min-height:76px}
@@ -82,14 +132,16 @@ main{max-width:980px;margin:0 auto;padding:0 22px}
   color:var(--ink-60);margin-bottom:5px;transition:color .2s}
 .field>label span{opacity:.55;letter-spacing:.1em}
 .field input{width:100%;background:transparent;border:0;border-bottom:1px solid var(--ink-40);
-  font:400 1rem var(--fs);color:var(--ink);padding:7px 2px;border-radius:0}
+  font:400 1rem var(--fs);color:var(--ink);padding:7px 2px;border-radius:0;
+  -webkit-appearance:none;appearance:none}
 .field input::placeholder,.field textarea::placeholder{color:var(--ink-40);font-style:italic}
 .field input:focus{outline:none;border-color:var(--red)}
 .field:focus-within>label{color:var(--red)}
 .field textarea{width:100%;border:1px solid var(--line);border-radius:8px;resize:none;min-height:112px;
   background-image:repeating-linear-gradient(180deg,transparent 0 28px,var(--line) 28px 29px);
   background-position:0 8px;font:400 1rem/29px var(--fs);color:var(--ink);padding:6px 13px;
-  transition:border-color .2s,box-shadow .2s}
+  transition:border-color .2s,box-shadow .2s;
+  -webkit-appearance:none;appearance:none}
 .field textarea:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px rgba(192,59,33,.08)}
 .ferr{font:italic 400 11.5px var(--fs);color:var(--red);margin-top:5px;min-height:14px}
 .ta-foot{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
@@ -107,10 +159,9 @@ main{max-width:980px;margin:0 auto;padding:0 22px}
 .draft-flash{font:italic 500 10px var(--fs);color:var(--red);opacity:0;transition:opacity .35s ease}
 .draft-flash.show{opacity:1}
 .card-note{margin-top:10px;font:400 9.5px var(--fm);letter-spacing:.1em;line-height:1.7;color:var(--ink-40);text-align:center}
-@media(max-height:820px){
-  .topbar{padding:9px 26px}
-  .masthead{padding-top:16px;padding-bottom:12px}
-  .masthead .hero-sub{margin-top:7px}
+
+/* layar pendek = rapatkan kartu supaya tombol kirim tetap terlihat */
+@media(max-height:780px){
   .card{padding:10px 22px}
   .card-head{min-height:46px}
   .stamp{width:44px;height:56px}
@@ -119,18 +170,14 @@ main{max-width:980px;margin:0 auto;padding:0 22px}
   .card-kicker{margin:2px 0 3px}
   .card-title{font-size:clamp(1.25rem,3.2vw,1.7rem)}
   .card-sub{font-size:.84rem;margin:5px 0 9px}
-  .field{margin-bottom:6px}
+  .field{margin-bottom:7px}
   .field textarea{min-height:64px}
   .send{padding:10px;margin-top:8px}
-  .field textarea{min-height:80px;font-size:.95rem;line-height:26px;
-    background-image:repeating-linear-gradient(180deg,transparent 0 25px,var(--line) 25px 26px);
-    background-position:0 7px}
-  .send{padding:12px;margin-top:12px;font-size:.95rem}
   .card-note{margin-top:8px;font-size:9px}
 }
 
 /* cek status */
-.cek-row{margin-top:14px;text-align:center}
+.cek-row{margin-top:clamp(14px,3vh,24px);padding-bottom:clamp(26px,5vh,50px);text-align:center}
 .cek-link{font:500 10.5px var(--fm);letter-spacing:.26em;text-transform:uppercase;color:var(--ink-60);
   text-decoration:none;border-bottom:1px solid var(--ui-line);padding:4px 2px;transition:color .2s,border-color .2s}
 .cek-link:hover{color:var(--red);border-color:var(--red)}
@@ -140,7 +187,7 @@ main{max-width:980px;margin:0 auto;padding:0 22px}
 .card.shake{animation:shake .5s}
 #letterForm{transition:opacity .45s}
 #letterForm.sent{opacity:.05;pointer-events:none}
-.card-success{position:absolute;inset:0;background:var(--paper);z-index:6;border-radius:14px;
+.card-success{position:absolute;inset:0;background:var(--lembar);z-index:6;border-radius:14px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
   padding:26px 22px;opacity:0;visibility:hidden;transition:opacity .4s ease,visibility 0s .4s}
 .card-success.show{opacity:1;visibility:visible;transition:opacity .4s ease}
@@ -168,7 +215,7 @@ main{max-width:980px;margin:0 auto;padding:0 22px}
   transition:color .2s,border-color .2s;font-family:var(--fm)}
 .ghostbtn:hover{color:var(--red);border-color:var(--red)}
 
-/* amplop "ada yang nyelip" — statis, hidup hanya saat disentuh */
+/* jalur kedua — amplop kecil di pojok kartu */
 .env-peek{position:absolute;right:22px;bottom:-30px;width:78px;height:56px;
   pointer-events:auto;transition:transform .3s ease,opacity .3s ease;
   transform:rotate(-3deg);cursor:pointer;z-index:7}
@@ -197,7 +244,7 @@ main{max-width:980px;margin:0 auto;padding:0 22px}
   border-right:1px solid rgba(34,29,21,.35);border-top:1px solid rgba(34,29,21,.35);transform:rotate(45deg)}
 .env-peek.open .env-ask{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0)}
 @media(max-width:640px){
-  /* dialog membuka ke KIRI amplop — tidak lagi terpotong tepi kanan layar */
+  /* membuka ke KIRI amplop — tidak terpotong tepi kanan layar */
   .env-ask{right:calc(100% + 14px);left:auto;bottom:-24px;top:auto;
     width:min(250px,calc(100vw - 64px));transform-origin:bottom right}
   .env-peek .env-hint{left:auto;right:0;transform:translateY(-100%)}
@@ -219,7 +266,7 @@ main{max-width:980px;margin:0 auto;padding:0 22px}
 
 /* ---------------- modal AKAR (segera hadir) ---------------- */
 body.soon-open{overflow:hidden}
-.soon-modal{position:fixed;inset:0;z-index:475;display:flex;align-items:center;justify-content:center;
+.soon-modal{position:fixed;inset:0;z-index:600;display:flex;align-items:center;justify-content:center;
   padding:22px;background:rgba(24,20,16,.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
   opacity:0;visibility:hidden;transition:opacity .25s ease,visibility 0s .25s}
 .soon-modal.show{opacity:1;visibility:visible;transition:opacity .25s ease}
@@ -263,85 +310,20 @@ body.soon-open{overflow:hidden}
 .soon-ok:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--red)}
 .soon-ok:active{transform:none;box-shadow:none}
 
-/* ============================================================
-   NARASI — bacaan statis di bawah form. Tanpa mesin scroll,
-   tanpa hijack. Urut seperti halaman buku.
-   ============================================================ */
-.narrative{border-top:1px solid var(--line);padding:clamp(48px,8vh,90px) 0 clamp(40px,6vh,64px)}
-.nar-head{text-align:center;margin-bottom:clamp(40px,7vh,70px)}
-.nar-head .kicker{margin-bottom:18px}
-.nar-title{font-family:var(--fd);font-weight:640;font-size:clamp(3.4rem,12vw,8.5rem);line-height:.9;
-  letter-spacing:-.015em;color:var(--ink)}
-.nar-title .dot{color:var(--red)}
-.nar-sub{margin:20px auto 0;font:italic 400 clamp(.95rem,1.6vw,1.1rem)/1.75 var(--fs);
-  color:var(--ink-60);max-width:46ch}
-
-.nar-block{max-width:640px;margin:0 auto clamp(40px,6.5vh,72px);padding-bottom:clamp(40px,6.5vh,72px);
-  border-bottom:1px solid rgba(34,29,21,.09)}
-.nar-block:last-of-type{border-bottom:0;padding-bottom:0;margin-bottom:0}
-.no-wrap{display:flex;align-items:baseline;gap:clamp(10px,2vw,18px);margin-bottom:clamp(14px,2.4vh,18px)}
-.no{font:italic 300 clamp(2.9rem,7.5vw,4.8rem)/.85 var(--fd);letter-spacing:-.03em;color:var(--ink)}
-.no::after{content:attr(data-g);position:absolute;left:.055em;top:.05em;z-index:-1;color:transparent;
-  -webkit-text-stroke:1.5px rgba(192,59,33,.5)}
-@supports not (-webkit-text-stroke:1px black){.no::after{color:rgba(192,59,33,.22)}}
-.no-wrap .wrap-no{position:relative;display:inline-block}
-.meta{display:flex;flex-direction:column;gap:8px}
-.word{font:500 .8rem var(--fm);letter-spacing:.5em;text-transform:uppercase;color:var(--red)}
-.rule{width:70px;height:1px;background:var(--ink);opacity:.55}
-.sub{font:italic 400 .95rem/1.6 var(--fs);color:var(--ink-60)}
-
-.nar-line{font:500 clamp(1.3rem,3.2vw,2rem)/1.45 var(--fd);letter-spacing:-.01em}
-.nar-line em{font-style:italic;color:var(--red)}
-.nar-note{margin-top:14px;font:italic 400 .95rem/1.7 var(--fs);color:var(--ink-60)}
-
-.poem-title{font:italic 500 clamp(1.2rem,2.4vw,1.5rem) var(--fd);color:var(--ink)}
-.poem-title::after{content:"";display:block;width:52px;height:1px;background:var(--red);margin-top:12px}
-.pl{display:flex;align-items:baseline;gap:16px;font:400 clamp(1.02rem,2vw,1.3rem)/1.7 var(--fs);
-  padding:6px 0;border-bottom:1px dashed rgba(34,29,21,.1)}
-.pl i{flex:none;width:28px;text-align:right;font:400 .58rem/1 var(--fm);font-style:normal;
-  letter-spacing:.1em;color:var(--ink-40)}
-.poem-by{margin-top:12px;font:400 10px var(--fm);letter-spacing:.26em;text-transform:uppercase;color:var(--ink-40)}
-
-.wishes{display:flex;flex-wrap:wrap;gap:.55rem .5rem}
-.wish{display:contents}
-.wish .ast{display:none}
-.wish .it{display:inline-flex;align-items:center;padding:.44em 1em;
-  border:1px solid var(--ui-line);border-radius:999px;background:rgba(252,249,242,.65)}
-.w-caps .it{font:700 .84rem var(--fd);letter-spacing:.05em;color:var(--ink)}
-.w-outline .it{font:600 .84rem var(--fd);letter-spacing:.05em;color:var(--ink);opacity:.82}
-.w-ital .it{font:italic 640 .84rem var(--fd);letter-spacing:.03em;color:var(--red)}
-.w-mono .it{font:500 .66rem var(--fm);letter-spacing:.22em;text-transform:uppercase;color:var(--ink-60)}
-
-.marginals{display:flex;flex-direction:column;gap:9px;
-  border-left:2px solid rgba(192,59,33,.38);padding-left:16px}
-.marg{font:italic 400 .85rem/1.55 var(--fs);color:var(--ink-60)}
-
-.nar-end{text-align:center;padding-top:clamp(24px,4vh,44px)}
-.s5-pre{font:italic 400 clamp(1.25rem,2.8vw,1.9rem) var(--fs);color:var(--ink)}
-.s5-big{font:italic 800 clamp(2.9rem,11vw,6.2rem)/1 var(--fd);color:var(--red);letter-spacing:-.02em;margin-top:4px}
-.s5-sub{margin-top:14px;font:500 10px var(--fm);letter-spacing:.3em;text-transform:uppercase;color:var(--ink-60)}
-.nar-end .ghostbtn{margin-top:20px}
-
-footer{border-top:1px solid var(--line);padding:22px 26px 30px;
+footer{border-top:1px solid var(--line);padding:20px 26px 26px;
   display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;
   font:500 8.5px var(--fm);letter-spacing:.3em;color:var(--ui);text-transform:uppercase}
 footer a{color:var(--ink-60);text-decoration:none;border-bottom:1px solid var(--ui-line);
   padding-bottom:2px;transition:color .2s,border-color .2s}
 footer a:hover{color:var(--red);border-color:var(--red)}
 
-/* mobile */
-@media(max-width:640px){
-  .letter-wrap{padding-bottom:56px}
-  .card{padding:16px 18px}
-  .draft-row{flex-wrap:wrap;gap:6px}
-  .env-ask{width:min(250px,calc(100vw - 80px))}
-  .frow{grid-template-columns:1fr}
-}
-
 /* aksesibilitas: hormati preferensi gerak minimal */
 @media (prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  .masthead,.letter-wrap{animation:none}
+  .amplop-layar{perspective:none}
+  .amplop .tutup,.amplop .lembar,.intro,main,.topbar,body.tetap-terbuka .topbar{transition:none}
+  .amplop.buka .tutup{transform:none;opacity:0}
+  .amplop.buka .lembar{transform:none}
+  .intro.pergi{transition:none}
   .card-success.show .seal{animation:none;opacity:1;transform:rotate(-11deg)}
   .card.shake{animation:none}
   .send:hover:not(:disabled),.soon-ok:hover{transform:none;box-shadow:none}
@@ -354,167 +336,114 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 
 <div class="grain" aria-hidden="true"></div>
 
-<div class="topbar">
-  <span>MPK · OSIS — <b>Gerakan Aspirasi Siswa</b></span>
-  <span><a href="https://kotak-aspirasi-osis.vercel.app/" style="color:var(--ink-60)">halaman demo · site asli ↗</a></span>
+<!-- ============ INTRO: AMPLOP TERTUTUP ============ -->
+<div class="intro" id="intro">
+  <p class="intro-kicker">MPK · OSIS — Gerakan Aspirasi Siswa</p>
+  <h1 class="intro-title" aria-label="KATAKAN.">KATAKAN<span class="dot">.</span></h1>
+  <p class="intro-sub">ada surat yang menunggu tulisanmu</p>
+
+  <button class="amplop" id="amplop" aria-label="Buka surat — tulis aspirasi">
+    <span class="amplop-layar" aria-hidden="true">
+      <i class="badan"></i>
+      <i class="lembar"><i>untukmu</i></i>
+      <i class="badan-v"></i>
+      <i class="tutup"></i>
+      <i class="mata"></i>
+    </span>
+    <span class="tulis-amplop">surat untuk sekolah</span>
+  </button>
+  <span class="amplop-hint" id="amplopHint" aria-hidden="true">klik untuk membuka</span>
 </div>
 
-<main>
+<!-- ============ ISI: KARTU SURAT ============ -->
+<div class="topbar">
+  <span>MPK · OSIS — <b>KATAKAN.</b></span>
+  <span id="topbarRight">MMXXV · Untuk Sekolah Kita</span>
+</div>
 
-  <!-- ============ SURAT ============ -->
-  <header class="masthead" id="surat">
-    <p class="kicker">Gerakan Aspirasi Siswa</p>
-    <h1 class="title" aria-label="KATAKAN.">KATAKAN<span class="dot">.</span></h1>
-    <p class="hero-sub">Tulis yang selama ini kau simpan — anonim, tanpa login, langsung sampai ke pengurus OSIS.</p>
-  </header>
+<main id="isi">
+  <section class="card" id="cardEl" aria-label="Formulir aspirasi">
+    <div class="card-head">
+      <svg class="postmark" viewBox="0 0 130 130" aria-hidden="true">
+        <defs><path id="pmc" d="M65 65 m -47 0 a 47 47 0 1 1 94 0 a 47 47 0 1 1 -94 0"/></defs>
+        <circle cx="65" cy="65" r="58" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <circle cx="65" cy="65" r="36" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <text font-size="10.5" letter-spacing="2.4" fill="currentColor" font-family="IBM Plex Mono,monospace"><textPath href="#pmc">GERAKAN ASPIRASI SISWA · KATAKAN · SEKOLAH KITA ·</textPath></text>
+        <text x="65" y="62" text-anchor="middle" font-size="9" letter-spacing="2.5" fill="currentColor" font-family="IBM Plex Mono,monospace">OSIS</text>
+        <text x="65" y="75" text-anchor="middle" font-size="9" letter-spacing="2.5" fill="currentColor" font-family="IBM Plex Mono,monospace">MMXXV</text>
+      </svg>
+      <div class="stampwrap"><div class="stamp">
+        <svg width="30" height="22" viewBox="-20 -16 40 26"><path d="M0 0 L-14 -9 L-5 1 Z" fill="currentColor" opacity=".5"/><path d="M0 0 L15 -11 L7 2 Z" fill="currentColor"/><path d="M0 0 L9 4 L0 8 L-7 4 Z" fill="currentColor"/></svg>
+        <b>50</b>
+      </div></div>
+    </div>
 
-  <div class="letter-wrap">
-    <section class="card" id="cardEl" aria-label="Formulir aspirasi">
-      <div class="card-head">
-        <svg class="postmark" viewBox="0 0 130 130" aria-hidden="true">
-          <defs><path id="pmc" d="M65 65 m -47 0 a 47 47 0 1 1 94 0 a 47 47 0 1 1 -94 0"/></defs>
-          <circle cx="65" cy="65" r="58" fill="none" stroke="currentColor" stroke-width="1.6"/>
-          <circle cx="65" cy="65" r="36" fill="none" stroke="currentColor" stroke-width="1.2"/>
-          <text font-size="10.5" letter-spacing="2.4" fill="currentColor" font-family="IBM Plex Mono,monospace"><textPath href="#pmc">GERAKAN ASPIRASI SISWA · KATAKAN · SEKOLAH KITA ·</textPath></text>
-          <text x="65" y="62" text-anchor="middle" font-size="9" letter-spacing="2.5" fill="currentColor" font-family="IBM Plex Mono,monospace">OSIS</text>
-          <text x="65" y="75" text-anchor="middle" font-size="9" letter-spacing="2.5" fill="currentColor" font-family="IBM Plex Mono,monospace">MMXXV</text>
+    <p class="card-kicker">Surat untuk Sekolah</p>
+    <h2 class="card-title">Tulis yang selama ini <em>kau simpan.</em></h2>
+    <p class="card-sub">Setiap surat dibaca langsung oleh pengurus OSIS, dirangkum setiap Jumat, dan dibahas dalam rapat bulanan bersama kepala sekolah. Boleh anonim — kehormatanmu kami jaga.</p>
+
+    <form id="letterForm" novalidate>
+      <div class="frow">
+        <div class="field"><label for="fNama">Nama <span>(opsional)</span></label>
+          <input id="fNama" type="text" autocomplete="name" placeholder="Boleh kosong — suratmu tetap sampai"></div>
+        <div class="field"><label for="fKelas">Kelas</label>
+          <input id="fKelas" type="text" autocomplete="off" placeholder="cth. XI RPL 2"></div>
+      </div>
+      <div class="field"><label for="fIsi">Aspirasimu</label>
+        <textarea id="fIsi" maxlength="600" placeholder="Tulis apa pun — ruang kelas, kegiatan, kantin, taman, guru, apa saja…"></textarea>
+        <div class="ta-foot"><p class="ferr" id="errIsi"></p><span class="counter" id="isiCount">0 / 600</span></div>
+      </div>
+      <button type="submit" class="send" id="sendBtn"><span>Kirim Surat</span>
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 12h17M14 6l7 6-7 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="draft-row">
+        <span class="draft-hint">draf tersimpan otomatis di perangkat ini</span>
+        <span class="draft-flash" id="draftFlash" aria-hidden="true">tersimpan</span>
+      </div>
+      <p class="card-note">Identitas (jika diisi) hanya dipakai untuk tindak lanjut.<br>Aspirasi dibahas pada rapat OSIS terdekat.</p>
+    </form>
+
+    <div class="env-peek" id="envPeek" role="button" tabindex="0" aria-label="Buka jalur dengan nama">
+      <span class="env-hint">ada yang nyelip</span>
+      <div class="env-peek-inner">
+        <svg class="env-svg" viewBox="0 0 78 56" aria-hidden="true">
+          <rect class="env-body" x="2" y="10" width="74" height="44" rx="4"/>
+          <path class="env-flap" d="M2 12 L39 40 L76 12 L76 14 L39 42 L2 14 Z"/>
+          <circle cx="39" cy="42" r="5.5" fill="none" stroke="#C03B21" stroke-width="1.6"/>
+          <circle cx="39" cy="42" r="2" fill="#C03B21"/>
         </svg>
-        <div class="stampwrap"><div class="stamp">
-          <svg width="30" height="22" viewBox="-20 -16 40 26"><path d="M0 0 L-14 -9 L-5 1 Z" fill="currentColor" opacity=".5"/><path d="M0 0 L15 -11 L7 2 Z" fill="currentColor"/><path d="M0 0 L9 4 L0 8 L-7 4 Z" fill="currentColor"/></svg>
-          <b>50</b>
-        </div></div>
       </div>
+      <span class="env-label">untukmu yang lebih dari sekadar anonim</span>
 
-      <p class="card-kicker">Surat untuk Sekolah</p>
-      <h2 class="card-title">Tulis yang selama ini <em>kau simpan.</em></h2>
-      <p class="card-sub">Setiap surat dibaca langsung oleh pengurus OSIS, dirangkum setiap Jumat, dan dibahas dalam rapat bulanan bersama kepala sekolah. Boleh anonim — kehormatanmu kami jaga.</p>
-
-      <form id="letterForm" novalidate>
-        <div class="frow">
-          <div class="field"><label for="fNama">Nama <span>(opsional)</span></label>
-            <input id="fNama" type="text" autocomplete="name" placeholder="Boleh kosong — suratmu tetap sampai"></div>
-          <div class="field"><label for="fKelas">Kelas</label>
-            <input id="fKelas" type="text" autocomplete="off" placeholder="cth. XI RPL 2"></div>
-        </div>
-        <div class="field"><label for="fIsi">Aspirasimu</label>
-          <textarea id="fIsi" maxlength="600" placeholder="Tulis apa pun — ruang kelas, kegiatan, kantin, taman, guru, apa saja…"></textarea>
-          <div class="ta-foot"><p class="ferr" id="errIsi"></p><span class="counter" id="isiCount">0 / 600</span></div>
-        </div>
-        <button type="submit" class="send" id="sendBtn"><span>Kirim Surat</span>
-          <svg viewBox="0 0 24 24" fill="none"><path d="M3 12h17M14 6l7 6-7 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <div class="draft-row">
-          <span class="draft-hint">draf tersimpan otomatis di perangkat ini</span>
-          <span class="draft-flash" id="draftFlash" aria-hidden="true">tersimpan</span>
-        </div>
-        <p class="card-note">Identitas (jika diisi) hanya dipakai untuk tindak lanjut.<br>Aspirasi dibahas pada rapat OSIS terdekat.</p>
-      </form>
-
-      <div class="env-peek" id="envPeek" role="button" tabindex="0" aria-label="Buka jalur dengan nama">
-        <span class="env-hint">ada yang nyelip</span>
-        <div class="env-peek-inner">
-          <svg class="env-svg" viewBox="0 0 78 56" aria-hidden="true">
-            <rect class="env-body" x="2" y="10" width="74" height="44" rx="4"/>
-            <path class="env-flap" d="M2 12 L39 40 L76 12 L76 14 L39 42 L2 14 Z"/>
-            <circle cx="39" cy="42" r="5.5" fill="none" stroke="#C03B21" stroke-width="1.6"/>
-            <circle cx="39" cy="42" r="2" fill="#C03B21"/>
-          </svg>
-        </div>
-        <span class="env-label">untukmu yang lebih dari sekadar anonim</span>
-
-        <div class="env-ask" id="envAsk" role="dialog" aria-label="Pertanyaan jalur">
-          <p class="env-ask-t">Mau yang bisa <b>dibalas</b>?</p>
-          <p class="env-ask-txt">Ada jalur lain — di situ kau menyertakan nama, dan kami bisa benar-benar mengetuk pintumu kembali.</p>
-          <div class="env-ask-btns">
-            <button type="button" class="env-btn ghost" id="envNo">Nanti saja</button>
-            <button type="button" class="env-btn yes" id="envYes">
-              <span>Buka</span>
-              <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-          </div>
+      <div class="env-ask" id="envAsk" role="dialog" aria-label="Pertanyaan jalur">
+        <p class="env-ask-t">Mau yang bisa <b>dibalas</b>?</p>
+        <p class="env-ask-txt">Ada jalur lain — di situ kau menyertakan nama, dan kami bisa benar-benar mengetuk pintumu kembali.</p>
+        <div class="env-ask-btns">
+          <button type="button" class="env-btn ghost" id="envNo">Nanti saja</button>
+          <button type="button" class="env-btn yes" id="envYes">
+            <span>Buka</span>
+            <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
       </div>
-
-      <div class="card-success" id="cardSuccess" role="status" aria-live="polite">
-        <div class="seal"><span>TERCATAT</span><small id="sealNo">No. —</small></div>
-        <p class="s-lead fx">Suratmu sudah kami terima.</p>
-        <p class="s-quote fx" id="sQuote"></p>
-        <p class="s-meta fx" id="sMeta"></p>
-        <p class="s-count fx" id="sCount"></p>
-        <button type="button" class="ghostbtn fx" id="againBtn">tulis surat lain</button>
-      </div>
-    </section>
-
-    <p class="cek-row"><a class="cek-link" href="https://kotak-aspirasi-osis.vercel.app/cek-aspirasi">sudah kirim? cek status aspirasimu</a></p>
-  </div>
-
-  <!-- ============ NARASI (bacaan statis) ============ -->
-  <section class="narrative" aria-label="Tentang gerakan ini">
-    <div class="nar-head">
-      <p class="kicker">Prolog</p>
-      <h2 class="nar-title" aria-label="KATAKAN.">KATAKAN<span class="dot">.</span></h2>
-      <p class="nar-sub">Sebuah perjalanan pendek tentang kata, keberanian, dan sekolah yang lebih baik.</p>
     </div>
 
-    <div class="nar-block">
-      <div class="no-wrap"><span class="wrap-no"><span class="no" data-g="I">I</span></span>
-        <div class="meta"><span class="word">Kata</span><i class="rule"></i><span class="sub">di mana semuanya berawal</span></div>
-      </div>
-      <p class="nar-line">Setiap perubahan di sekolah ini berawal dari satu <em>kata</em> yang berani dituliskan.</p>
-      <p class="nar-note">Tak ada yang terlalu kecil untuk disampaikan.</p>
-    </div>
-
-    <div class="nar-block">
-      <div class="no-wrap"><span class="wrap-no"><span class="no" data-g="II">II</span></span>
-        <div class="meta"><span class="word">Puisi</span><i class="rule"></i><span class="sub">untuk yang belum sempat terdengar</span></div>
-      </div>
-      <p class="poem-title">Untuk yang Diam</p>
-      <div id="poemLines"></div>
-      <p class="poem-by">— ditemukan di halaman belakang buku tulis</p>
-    </div>
-
-    <div class="nar-block">
-      <div class="no-wrap"><span class="wrap-no"><span class="no" data-g="III">III</span></span>
-        <div class="meta"><span class="word">Terbang</span><i class="rule"></i><span class="sub">kata yang menemukan sayapnya</span></div>
-      </div>
-      <p class="nar-line">Kata yang ditulis <em>tidak pernah diam.</em></p>
-      <p class="nar-note">Ia berpindah dari meja ke meja, dari mulut ke mulut — sampai suatu hari ia menjadi keputusan.</p>
-    </div>
-
-    <div class="nar-block">
-      <div class="no-wrap"><span class="wrap-no"><span class="no" data-g="IV">IV</span></span>
-        <div class="meta"><span class="word">Parade</span><i class="rule"></i><span class="sub">ribuan harapan berjalan sekaligus</span></div>
-      </div>
-      <div class="wishes" id="wishesHost"></div>
-      <p class="nar-note">Ribuan harapan seperti ini berjalan di lorong sekolah setiap hari. Sebagian berhenti jadi gumam, sebagian hilang di kepala sendiri. Hari ini, biarkan milikmu sampai.</p>
-    </div>
-
-    <div class="nar-block">
-      <div class="no-wrap"><span class="wrap-no"><span class="no" data-g="V">V</span></span>
-        <div class="meta"><span class="word">Tinta</span><i class="rule"></i><span class="sub">sedikit tinta, banyak arti</span></div>
-      </div>
-      <div class="marginals">
-        <i class="marg">— dicoret dua kali sebelum akhirnya menjadi kalimat</i>
-        <i class="marg">± sebagian baris sempat dihapus, lalu ditulis ulang</i>
-        <i class="marg">— pernah menjadi bisik-bisik di kelas sebelah</i>
-        <i class="marg">± setiap lorong menyimpan satu permohonan</i>
-        <i class="marg">— tinta masih hangat, kertas masih menunggu</i>
-      </div>
-    </div>
-
-    <div class="nar-end">
-      <p class="s5-pre">Sekarang,</p>
-      <p class="s5-big">giliranmu.</p>
-      <p class="s5-sub">satu surat pendek — itu saja yang kami butuhkan</p>
-      <a class="ghostbtn" href="#surat">↑ tulis suratmu</a>
+    <div class="card-success" id="cardSuccess" role="status" aria-live="polite">
+      <div class="seal"><span>TERCATAT</span><small id="sealNo">No. —</small></div>
+      <p class="s-lead fx">Suratmu sudah kami terima.</p>
+      <p class="s-quote fx" id="sQuote"></p>
+      <p class="s-meta fx" id="sMeta"></p>
+      <p class="s-count fx" id="sCount"></p>
+      <button type="button" class="ghostbtn fx" id="againBtn">tulis surat lain</button>
     </div>
   </section>
 
+  <p class="cek-row"><a class="cek-link" id="cekLink" href="/cek-aspirasi">sudah kirim? cek status aspirasimu</a></p>
 </main>
 
 <footer>
   <span>MPK · OSIS · MMXXV</span>
-  <span><a href="https://kotak-aspirasi-osis.vercel.app/cek-aspirasi">Cek status aspirasi</a></span>
+  <span><a id="footerLink" href="/cek-aspirasi">Cek status aspirasi</a></span>
 </footer>
 
 <!-- JALUR KEDUA (SEGERA HADIR) -->
@@ -558,6 +487,25 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 (function(){
 'use strict';
 const $=s=>document.querySelector(s);
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const OFF_HOST=!(['kotak-aspirasi-osis.vercel.app','localhost','127.0.0.1'].some(h=>location.hostname===h));
+
+/* ---------------- intro: klik amplop → surat terbuka ---------------- */
+const intro=$('#intro'),isi=$('#isi'),amplop=$('#amplop'),hint=$('#amplopHint'),topbar=$('.topbar');
+function tampilkanSurat(){
+  intro.classList.add('pergi');
+  isi.classList.add('tampak');
+  document.body.classList.add('tetap-terbuka');
+  setTimeout(()=>{intro.style.display='none';},REDUCED?60:400);
+}
+amplop.addEventListener('click',()=>{
+  if(amplop.classList.contains('buka'))return;
+  amplop.classList.add('buka');intro.classList.add('dibuka');
+  setTimeout(tampilkanSurat,REDUCED?60:1150);
+});
+amplop.addEventListener('keydown',e=>{
+  if(e.key==='Enter'||e.key===' '){e.preventDefault();amplop.click();}
+});
 
 /* ---------------- form: counter + draf ---------------- */
 const fIsi=$('#fIsi'),isiCount=$('#isiCount'),draftFlash=$('#draftFlash');
@@ -583,8 +531,7 @@ formEl.addEventListener('submit',e=>{e.preventDefault();
  let ok=true;if(isi.length<20){$('#errIsi').textContent='Tulis setidaknya 20 karakter — suaramu layak dibaca utuh.';ok=false;}
  if(!ok){cardEl.classList.remove('shake');void cardEl.offsetWidth;cardEl.classList.add('shake');return;}
  sendBtn.disabled=true;sendBtn.querySelector('span').textContent='Menjahit suratmu…';
- const DEMO_OFF_HOST = !(['kotak-aspirasi-osis.vercel.app','localhost','127.0.0.1'].some(h=>location.hostname===h));
- const API = DEMO_OFF_HOST ? 'https://kotak-aspirasi-osis.vercel.app/api/aspirasi' : '/api/aspirasi';
+ const API=OFF_HOST?'https://kotak-aspirasi-osis.vercel.app/api/aspirasi':'/api/aspirasi';
  fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
   body:JSON.stringify({isi})})
  .then(res=>{if(!res.ok)throw new Error('server');return res.json();})
@@ -600,9 +547,9 @@ formEl.addEventListener('submit',e=>{e.preventDefault();
   sendBtn.disabled=false;sendBtn.querySelector('span').textContent='Kirim Surat';
  })
  .catch(()=>{
-  $('#errIsi').innerHTML = DEMO_OFF_HOST
-    ? 'Ini halaman demo statis — pengiriman diblokir lintas-domain. Kirim asli lewat <a style="color:var(--red);text-decoration:underline" href="https://kotak-aspirasi-osis.vercel.app/">kotak-aspirasi-osis.vercel.app</a>.'
-    : 'Gagal terhubung ke server. Coba lagi nanti.';
+  $('#errIsi').innerHTML=OFF_HOST
+    ?'Ini halaman demo statis — pengiriman diblokir lintas-domain. Kirim asli lewat <a style="color:var(--red);text-decoration:underline" href="https://kotak-aspirasi-osis.vercel.app/">kotak-aspirasi-osis.vercel.app</a>.'
+    :'Gagal terhubung ke server. Coba lagi nanti.';
   cardEl.classList.remove('shake');void cardEl.offsetWidth;cardEl.classList.add('shake');
   sendBtn.disabled=false;sendBtn.querySelector('span').textContent='Kirim Surat';
  });});
@@ -610,8 +557,8 @@ $('#againBtn').addEventListener('click',()=>{successEl.classList.remove('show');
  formEl.classList.remove('sent');formEl.reset();isiCount.textContent='0 / 600';
  $('#errIsi').textContent='';clearDraft();});
 
-/* ---------------- amplop → jalur kedua ---------------- */
-const envPeek=$('#envPeek'),soonModal=$('#soonModal'),soonCard=$('#soonCard');
+/* ---------------- amplop kecil → jalur kedua ---------------- */
+const envPeek=$('#envPeek'),soonModal=$('#soonModal');
 envPeek.addEventListener('click',e=>{
  if(e.target.closest('.env-ask'))return;
  envPeek.classList.toggle('open');});
@@ -626,32 +573,14 @@ $('#soonOk').addEventListener('click',closeSoon);
 soonModal.addEventListener('click',e=>{if(e.target===soonModal)closeSoon();});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&soonModal.classList.contains('show'))closeSoon();});
 
-/* ---------------- puisi + parade harapan (statis) ---------------- */
-const POEM=[
- 'Di koridor yang sama, setiap pagi,',
- 'seribu pikiran berjalan tanpa suara.',
- 'Ada yang menyimpan mimpi di saku,',
- 'ada yang menahan pertanyaan di ujung pulpen.',
- 'Sekolah bukan hanya tembok dan jam pelajaran —',
- 'ia adalah kita: yang datang, yang berharap,',
- 'yang percaya esok lebih baik dari kemarin.'
-];
-const poemEl=$('#poemLines');
-POEM.forEach((l,i)=>{const d=document.createElement('p');d.className='pl';
- d.innerHTML='<i>'+String(i+1).padStart(2,'0')+'</i><span>'+l+'</span>';poemEl.appendChild(d);});
-
-const AST_FIX='<svg class="ast" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M2 12h20M4.9 4.9l14.2 14.2M19.1 4.9 4.9 19.1"/></svg>';
-const ROWS=[
- {cls:'w-caps', items:['PANGGUNG MUSIK','RUANG BACA','TAMAN BELAKANG','DINDING LUKIS']},
- {cls:'w-outline',items:['JAM PELAJARAN MANUSIAWI','KANTIN SEHAT','LAB BARU','LAMPU LORONG']},
- {cls:'w-ital', items:['turnamen futsal','klub menulis','sanggar musik','pasar karya','pojok baca']},
- {cls:'w-mono', items:['KEBEBASAN BEREKSPRESI','RUANG UNTUK BERTANYA','GURU YANG MENDENGARKAN','KARYA DI DINDING']}
-];
-const wishesHost=$('#wishesHost');
-ROWS.forEach(r=>{
- const el=document.createElement('p');el.className='wish '+r.cls;
- el.innerHTML=r.items.map(it=>'<span class="it">'+it+'</span>').join(AST_FIX);
- wishesHost.appendChild(el);});
+/* di host demo: tautan mengarah ke situs asli */
+if(OFF_HOST){
+  const L='https://kotak-aspirasi-osis.vercel.app';
+  const cek=$('#cekLink'),foot=$('#footerLink'),tb=$('#topbarRight');
+  if(cek)cek.href=L+'/cek-aspirasi';
+  if(foot)foot.href=L+'/cek-aspirasi';
+  if(tb)tb.innerHTML='<a href="'+L+'/" style="color:var(--ink-60)">halaman demo · site asli ↗</a>';
+}
 })();
 </script>
 </body>
