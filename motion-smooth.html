@@ -267,9 +267,42 @@ body.ink-mode .s4-cap{color:rgba(242,236,222,.62)}
   background:var(--paper);border:1px solid rgba(34,29,21,.3);border-radius:14px;
   padding:clamp(16px,3.4vw,32px) clamp(18px,5vw,42px);
   box-shadow:0 44px 90px -28px rgba(0,0,0,.75);
-  transform-origin:50% 58%;pointer-events:none;will-change:transform}
+  transform-origin:50% 58%;pointer-events:none;will-change:transform;z-index:6}
 @media(max-width:640px){.card{width:calc(100vw - 56px)}}
 .s-card.live .card{pointer-events:auto}
+/* ---- amplop penutup: kartu baru keluar setelah diketuk ---- */
+.env-final{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(520px,86vw);display:flex;flex-direction:column;align-items:center;gap:clamp(10px,2vw,16px);
+  z-index:5;will-change:transform,opacity;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ef{position:relative;width:100%;aspect-ratio:1.72;perspective:900px}
+.ef-back{position:absolute;inset:0;background:#E4D5B6;border:1.5px solid rgba(34,29,21,.4);border-radius:5px;
+  box-shadow:0 34px 60px -26px rgba(0,0,0,.75)}
+.ef-paper{position:absolute;left:4%;right:4%;top:6%;bottom:0;background:#FBF6E7;
+  border:1px solid rgba(34,29,21,.18);border-radius:3px;
+  display:flex;align-items:flex-end;justify-content:center;padding-bottom:9px;
+  font:italic 400 clamp(11px,2.6vw,14px)/1.2 var(--fs);color:rgba(34,29,21,.4);
+  transform:translateY(0);transition:transform .85s cubic-bezier(.16,1,.3,1)}
+.ef-front{position:absolute;inset:0;background:#EFE4CC;border-radius:5px;
+  clip-path:polygon(0 20%,50% 62%,100% 20%,100% 100%,0 100%)}
+.ef-flap{position:absolute;left:0;right:0;top:0;height:62%;
+  background:linear-gradient(180deg,#EADCBF,#DFCFAC);
+  clip-path:polygon(0 0,100% 0,50% 100%);
+  transform-origin:50% 0;transform:rotateX(0deg);backface-visibility:hidden;
+  transition:transform .8s cubic-bezier(.55,0,.2,1);border-radius:5px 5px 0 0}
+.ef-seal{position:absolute;left:50%;top:62%;transform:translate(-50%,-50%);
+  width:clamp(26px,6.4vw,34px);height:clamp(26px,6.4vw,34px);border-radius:50%;background:#C03B21;color:#F7EEDD;
+  display:flex;align-items:center;justify-content:center;font-size:clamp(13px,3vw,16px);
+  box-shadow:0 3px 9px rgba(0,0,0,.4);transition:opacity .35s ease}
+.ef-hint{font:500 9.5px var(--fm);letter-spacing:.3em;text-transform:lowercase;color:rgba(242,236,222,.75);
+  border:1px solid rgba(242,236,222,.28);border-radius:999px;padding:7px 14px;background:rgba(0,0,0,.25)}
+/* keadaan terbuka */
+.s-card.dibuka .ef-flap{transform:rotateX(176deg)}
+.s-card.dibuka .ef-paper{transform:translateY(-15%)}
+.s-card.dibuka .ef-seal{opacity:0}
+.s-card.dibuka .env-final{opacity:0!important;transform:translate(-50%,-50%) translateY(18px) scale(.95)!important;
+  pointer-events:none!important;transition:opacity .45s ease .1s,transform .6s ease .1s}
+.s-card.dibuka .card{opacity:1!important;pointer-events:auto!important;transform:none!important;
+  transition:transform .85s cubic-bezier(.16,1,.3,1) .18s,opacity .5s ease .22s}
 .card-head{position:relative;min-height:76px}
 .stampwrap{position:absolute;top:0;right:0;padding:6px;transform:rotate(4deg);
   background-image:radial-gradient(circle 2.7px, var(--paper) 2.25px, transparent 3px);background-size:9px 9px}
@@ -770,6 +803,16 @@ body.soon-open .flock{opacity:0!important;transition:opacity .35s ease}
   </section>
 
   <section class="scene s-card" id="sCard">
+    <div class="env-final" id="envFinal" role="button" tabindex="0" aria-label="Ketuk untuk membuka surat">
+      <div class="ef">
+        <div class="ef-back"></div>
+        <div class="ef-paper"><span>surat untuk sekolah</span></div>
+        <div class="ef-front"></div>
+        <div class="ef-flap"></div>
+        <div class="ef-seal">&#10022;</div>
+      </div>
+      <span class="ef-hint">ketuk untuk membuka</span>
+    </div>
     <div class="card" id="cardEl">
       <div class="card-head">
         <svg class="postmark" viewBox="0 0 130 130" aria-hidden="true">
@@ -889,7 +932,7 @@ body.soon-open .flock{opacity:0!important;transition:opacity .35s ease}
 <div id="bgBase" aria-hidden="true"></div>
 <div id="bgTop" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
-<div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#1F3A22;color:#F2ECDE;font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.24em;text-transform:uppercase;padding:7px 12px;text-align:center">Versi SMOOTH — kualitas penuh, tetap ringan &nbsp;·&nbsp; <a href="./motion.html" style="color:#B7E4A8">asli ↗</a> &nbsp;·&nbsp; <a href="./motion-lite.html" style="color:#B7E4A8">lite ↗</a> &nbsp;·&nbsp; <a href="./index.html" style="color:#B7E4A8">tenang ↗</a></div>
+<div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#1F3A22;color:#F2ECDE;font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.24em;text-transform:uppercase;padding:7px 10px;text-align:center;white-space:normal;line-height:1.6;font-size:clamp(7px,2vw,9px)">Versi SMOOTH — kualitas penuh, tetap ringan &nbsp;·&nbsp; <a href="./motion.html" style="color:#B7E4A8">asli ↗</a> &nbsp;·&nbsp; <a href="./motion-lite.html" style="color:#B7E4A8">lite ↗</a> &nbsp;·&nbsp; <a href="./index.html" style="color:#B7E4A8">tenang ↗</a></div>
 <noscript><div>Halaman ini membutuhkan JavaScript untuk berjalan. Matikan mode pembatas, lalu muat ulang.</div></noscript>
 
 <script>
@@ -933,6 +976,7 @@ const cursorEl=$('#cursor'),progressBar=$('#progressBar'),chDot=$('#chDot');
 const s4cap=$('#s4cap'),s5sub=$('#s5sub'),folioNo=$('#folioNo');
 const rulesEl=$('#rules'),ruleMargin=$('#ruleMargin');
 const foldEl=$('#fold'),foldFill=$('#foldFill'),foldEdge=$('#foldEdge');
+const envFinal=$('#envFinal');let _sCardBuka=false;
 const b1=$('#blinds1'),b2=$('#blinds2'),bars1=[...b1.children],bars2=[...b2.children];
 const splashEl=$('#splash');
 const tipEl=$('#stitchTip'),aksesEl=$('#akses'),draftFlash=$('#draftFlash');
@@ -1333,7 +1377,16 @@ function renderScroll(p,t){
  const cin=rng(p,.972,.988),cy2=rng(p,.978,.995);
  st(sCard,'opacity',cin);
  st(sCard,'visibility',cin>.004?'visible':'hidden');
- st(cardEl,'transform','translateY('+((1-eo(cy2))*64)+'px) scale('+lerp(.96,1,eo(cy2))+') rotate('+lerp(2.4,-.5,eo(cy2))+'deg)');
+ /* amplop masuk dulu; kartu tetap tersembunyi sampai diketuk */
+ const envIn=eo(cy2);
+ if(!_sCardBuka){
+  st(envFinal,'opacity',envIn.toFixed(3));
+  st(envFinal,'transform','translate(-50%,-50%) translateY('+((1-envIn)*42).toFixed(1)+'px) scale('+lerp(.9,1,envIn).toFixed(3)+')');
+  st(envFinal,'pointer-events',cin>.45?'auto':'none');
+  st(cardEl,'opacity',0);
+  st(cardEl,'pointer-events','none');
+  st(cardEl,'transform','translateY(46px) scale(.9) rotate(1.5deg)');
+ }
  const liveNow=p>.985;
  if(liveNow!==_cardLive){_cardLive=liveNow;sCard.classList.toggle('live',liveNow);}
  const TH=[0,.09,.27,.52,.66,.82,.958];
@@ -1584,6 +1637,20 @@ soonModal.addEventListener('click',e=>{
 addEventListener('keydown',e=>{
  if(e.key==='Escape'&&soonModal.classList.contains('show'))closeSoon();
 });
+
+/* ---- buka surat: penutup motion ---- */
+function bukaSurat(){
+ if(_sCardBuka)return;
+ _sCardBuka=true;
+ sCard.classList.add('dibuka');
+ setTimeout(function(){forceScroll=true;last=performance.now();startLoop();},30);
+}
+if(envFinal){
+ envFinal.addEventListener('click',bukaSurat);
+ envFinal.addEventListener('keydown',function(e){
+  if(e.key==='Enter'||e.key===' '){e.preventDefault();bukaSurat();}
+ });
+}
 
 buildStitch();measureRows();cacheLetters();sizeInk();layoutRules();
 startLoop();
