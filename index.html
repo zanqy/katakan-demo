@@ -242,11 +242,14 @@ main.tampak .card{animation:rise .55s cubic-bezier(.2,.8,.3,1) both}
 .ghostbtn:hover{color:var(--red);border-color:var(--red)}
 
 /* jalur kedua — amplop kecil di pojok kartu */
-.env-peek{position:absolute;right:18px;bottom:-26px;width:72px;height:52px;
-  pointer-events:auto;transition:transform .3s ease,opacity .3s ease;
+/* baris ajakan: in-flow, rata kanan - bukan absolut yang menggantung */
+.env-row{display:flex;justify-content:flex-end;align-items:flex-start;
+  margin-top:14px;padding-top:4px}
+.env-peek{position:relative;width:72px;height:52px;flex:none;
+  pointer-events:auto;transition:transform .3s ease;
   transform:rotate(-3deg);cursor:pointer;z-index:7}
 .env-peek:hover{transform:translateY(-4px) rotate(0deg)}
-@media(max-width:640px){.env-peek{right:12px;bottom:-22px;width:60px;height:44px}}
+@media(max-width:640px){.env-peek{width:60px;height:44px}}
 .env-peek-inner{position:relative;width:100%;height:100%;filter:drop-shadow(0 8px 14px rgba(0,0,0,.25))}
 .env-svg{width:100%;height:100%;overflow:visible}
 .env-body{fill:#EDE4CF;stroke:rgba(34,29,21,.55);stroke-width:1.2}
@@ -256,34 +259,20 @@ main.tampak .card{animation:rise .55s cubic-bezier(.2,.8,.3,1) both}
   background:var(--paper);padding:3px 8px;border-radius:999px;white-space:nowrap;
   opacity:0;transition:opacity .3s ease;border:1px solid var(--red)}
 .env-peek.open .env-hint,.env-peek:hover .env-hint{opacity:1}
-.env-label{position:absolute;right:0;bottom:-22px;
+.env-label{position:absolute;right:100%;bottom:50%;transform:translateY(50%);
+  margin-right:12px;
   font:italic 400 11px var(--fs);color:var(--ink-40);white-space:nowrap;text-align:right;
-  opacity:0;transition:opacity .6s ease .2s}
+  opacity:0;transition:opacity .6s ease .2s;pointer-events:none}
 .env-peek.open .env-label{opacity:1}
-.env-ask{position:absolute;right:105px;bottom:-8px;width:250px;
+@media(max-width:640px){.env-label{right:auto;left:100%;margin-right:0;margin-left:12px;text-align:left}}
+/* dialog: anak body, fixed, diposisikan JS dekat amplop */
+.env-ask{position:fixed;left:0;top:0;width:min(280px,calc(100vw - 32px));
   background:var(--paper);border:1px solid rgba(34,29,21,.35);border-radius:10px;
-  padding:12px 14px;text-align:left;box-shadow:0 12px 26px -12px rgba(0,0,0,.3);
-  transform:translateY(4px);transform-origin:bottom right;
+  padding:12px 14px;text-align:left;box-shadow:0 14px 30px -14px rgba(0,0,0,.35);
+  transform:translateY(6px) scale(.97);transform-origin:50% 100%;
   opacity:0;visibility:hidden;pointer-events:none;
-  transition:opacity .25s ease,transform .25s ease,visibility 0s .25s;z-index:8}
-.env-ask::after{content:"";position:absolute;right:-7px;bottom:22px;width:12px;height:12px;background:var(--paper);
-  border-right:1px solid rgba(34,29,21,.35);border-top:1px solid rgba(34,29,21,.35);transform:rotate(45deg)}
-.env-peek.open .env-ask{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0)}
-@media(max-width:640px){
-  /* dialog jadi fixed di layar kecil — tidak mungkin menjorok keluar layar
-     di device sempit (dulu ke kiri amplop, bisa keluar sampai -43px) */
-  .env-ask{position:fixed;left:16px;right:16px;bottom:84px;top:auto;
-    width:auto;max-width:340px;margin:0 auto;transform:translateY(8px);
-    transform-origin:50% 100%;z-index:700}
-  .env-ask::after{display:none}
-  .env-peek.open .env-ask{transform:translateY(0)}
-  .env-peek .env-hint{left:auto;right:0;transform:translateY(-100%)}
-  .env-peek:hover .env-hint,.env-peek.open .env-hint{transform:translateY(-110%)}
-  .env-label{right:auto;left:-4px;text-align:left}
-}
-@media(max-width:380px){
-  .env-ask{left:12px;right:12px;bottom:76px;max-width:none}
-}
+  transition:opacity .2s ease,transform .2s ease,visibility 0s .2s;z-index:700}
+.env-ask.buka{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0) scale(1)}
 .env-ask-t{font:600 11.5px var(--fm);letter-spacing:.04em;color:var(--ink);margin-bottom:6px}
 .env-ask-t b{color:var(--red);font-weight:600}
 .env-ask-txt{font:italic 400 12.5px/1.5 var(--fs);color:var(--ink-60);margin-bottom:10px}
@@ -445,28 +434,18 @@ footer a:hover{color:var(--red);border-color:var(--red)}
       <p class="card-note">Identitas (jika diisi) hanya dipakai untuk tindak lanjut.<br>Aspirasi dibahas pada rapat OSIS terdekat.</p>
     </form>
 
-    <div class="env-peek" id="envPeek" role="button" tabindex="0" aria-label="Buka jalur dengan nama">
-      <span class="env-hint">ada yang nyelip</span>
-      <div class="env-peek-inner">
-        <svg class="env-svg" viewBox="0 0 78 56" aria-hidden="true">
-          <rect class="env-body" x="2" y="10" width="74" height="44" rx="4"/>
-          <path class="env-flap" d="M2 12 L39 40 L76 12 L76 14 L39 42 L2 14 Z"/>
-          <circle cx="39" cy="42" r="5.5" fill="none" stroke="#C03B21" stroke-width="1.6"/>
-          <circle cx="39" cy="42" r="2" fill="#C03B21"/>
-        </svg>
-      </div>
-      <span class="env-label">untukmu yang lebih dari sekadar anonim</span>
-
-      <div class="env-ask" id="envAsk" role="dialog" aria-label="Pertanyaan jalur">
-        <p class="env-ask-t">Mau yang bisa <b>dibalas</b>?</p>
-        <p class="env-ask-txt">Ada jalur lain — di situ kau menyertakan nama, dan kami bisa benar-benar mengetuk pintumu kembali.</p>
-        <div class="env-ask-btns">
-          <button type="button" class="env-btn ghost" id="envNo">Nanti saja</button>
-          <button type="button" class="env-btn yes" id="envYes">
-            <span>Buka</span>
-            <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
+    <div class="env-row">
+      <div class="env-peek" id="envPeek" role="button" tabindex="0" aria-label="Buka jalur dengan nama">
+        <span class="env-hint">ada yang nyelip</span>
+        <div class="env-peek-inner">
+          <svg class="env-svg" viewBox="0 0 78 56" aria-hidden="true">
+            <rect class="env-body" x="2" y="10" width="74" height="44" rx="4"/>
+            <path class="env-flap" d="M2 12 L39 40 L76 12 L76 14 L39 42 L2 14 Z"/>
+            <circle cx="39" cy="42" r="5.5" fill="none" stroke="#C03B21" stroke-width="1.6"/>
+            <circle cx="39" cy="42" r="2" fill="#C03B21"/>
+          </svg>
         </div>
+        <span class="env-label">untukmu yang lebih dari sekadar anonim</span>
       </div>
     </div>
 
@@ -487,6 +466,19 @@ footer a:hover{color:var(--red);border-color:var(--red)}
   <span>MPK · OSIS · MMXXV</span>
   <span><a id="footerLink" href="/cek-aspirasi">Cek status aspirasi</a></span>
 </footer>
+
+<!-- dialog jalur kedua: anak body, diposisikan JS (bukan anak amplop) -->
+<div class="env-ask" id="envAsk" role="dialog" aria-label="Pertanyaan jalur">
+  <p class="env-ask-t">Mau yang bisa <b>dibalas</b>?</p>
+  <p class="env-ask-txt">Ada jalur lain — di situ kau menyertakan nama, dan kami bisa benar-benar mengetuk pintumu kembali.</p>
+  <div class="env-ask-btns">
+    <button type="button" class="env-btn ghost" id="envNo">Nanti saja</button>
+    <button type="button" class="env-btn yes" id="envYes">
+      <span>Buka</span>
+      <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</div>
 
 <!-- JALUR KEDUA (SEGERA HADIR) -->
 <div class="soon-modal" id="soonModal" role="dialog" aria-modal="true" aria-labelledby="soonTitle">
@@ -562,6 +554,12 @@ amplop.addEventListener('click',()=>{
 document.addEventListener('visibilitychange',()=>{
   if(!document.hidden&&amplop.classList.contains('buka'))selesaiBuka();
 });
+/* klik di luar = tutup dialog jalur kedua */
+document.addEventListener('click',e=>{
+  if(!envTerbuka)return;
+  if(e.target.closest('.env-ask')||e.target.closest('#envPeek'))return;
+  tutupDialog();
+});
 amplop.addEventListener('keydown',e=>{
   if(e.key==='Enter'||e.key===' '){e.preventDefault();amplop.click();}
 });
@@ -617,16 +615,39 @@ $('#againBtn').addEventListener('click',()=>{successEl.classList.remove('show');
  $('#errIsi').textContent='';clearDraft();});
 
 /* ---------------- amplop kecil → jalur kedua ---------------- */
-const envPeek=$('#envPeek'),soonModal=$('#soonModal');
+const envPeek=$('#envPeek'),envAsk=$('#envAsk'),soonModal=$('#soonModal');
+let envTerbuka=false;
+function tempatkanDialog(){
+  if(!envAsk||!envPeek)return;
+  const p=envPeek.getBoundingClientRect();
+  const w=envAsk.offsetWidth,h=envAsk.offsetHeight;
+  const M=12;
+  let left=p.left+ p.width/2 - w/2;              /* di atas amplop, rata tengah */
+  let top=p.top-h-10;
+  if(top<M) top=p.bottom+10;                      /* kalau tak cukup di atas -> di bawah */
+  left=Math.max(M,Math.min(left,innerWidth-w-M));
+  top=Math.max(M,Math.min(top,innerHeight-h-M));
+  envAsk.style.left=Math.round(left)+'px';
+  envAsk.style.top=Math.round(top)+'px';
+}
+function bukaDialog(){
+  envTerbuka=true;envPeek.classList.add('open');
+  tempatkanDialog();envAsk.classList.add('buka');
+}
+function tutupDialog(){
+  envTerbuka=false;envPeek.classList.remove('open');
+  envAsk.classList.remove('buka');
+}
 envPeek.addEventListener('click',e=>{
  if(e.target.closest('.env-ask'))return;
- envPeek.classList.toggle('open');});
+ envTerbuka?tutupDialog():bukaDialog();});
 envPeek.addEventListener('keydown',e=>{
  if(e.key==='Enter'||e.key===' '){e.preventDefault();envPeek.click();}});
-$('#envNo').addEventListener('click',e=>{e.stopPropagation();envPeek.classList.remove('open');});
+$('#envNo').addEventListener('click',e=>{e.stopPropagation();tutupDialog();});
+addEventListener('resize',()=>{if(envTerbuka)tempatkanDialog();});
 function openSoon(){soonModal.classList.add('show');document.body.classList.add('soon-open');}
 function closeSoon(){soonModal.classList.remove('show');document.body.classList.remove('soon-open');}
-$('#envYes').addEventListener('click',e=>{e.stopPropagation();envPeek.classList.remove('open');openSoon();});
+$('#envYes').addEventListener('click',e=>{e.stopPropagation();tutupDialog();openSoon();});
 $('#soonClose').addEventListener('click',closeSoon);
 $('#soonOk').addEventListener('click',closeSoon);
 soonModal.addEventListener('click',e=>{if(e.target===soonModal)closeSoon();});
