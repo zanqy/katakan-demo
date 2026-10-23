@@ -37,27 +37,30 @@ body{background:var(--paper);color:var(--ink);font-family:var(--fs);
 
 /* bilah atas (muncul setelah amplop dibuka) */
 body.sedang-intro{overflow:hidden;height:100dvh}
-.topbar{display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+.topbar{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
   padding:11px 26px;border-bottom:1px solid var(--line);opacity:0;visibility:hidden;
-  font:500 8.5px var(--fm);letter-spacing:.3em;color:var(--ui);text-transform:uppercase}
+  font:500 8.5px var(--fm);letter-spacing:.3em;color:var(--ui);text-transform:uppercase;
+  flex-wrap:wrap}
 body.tetap-terbuka .topbar{opacity:1;visibility:visible;transition:opacity .45s ease .1s}
 .topbar b{color:var(--ink);font-weight:500}
-@media(max-width:640px){.topbar{padding:10px 16px;font-size:8px;letter-spacing:.2em}}
+@media(max-width:640px){.topbar{padding:10px 14px;font-size:8px;letter-spacing:.16em;gap:6px}}
+@media(max-width:400px){.topbar{font-size:7.5px;letter-spacing:.1em}}
 
 /* ============================================================
    INTRO — AMPLOP TERTUTUP
    ============================================================ */
 .intro{position:fixed;inset:0;z-index:500;background:var(--paper);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:clamp(10px,2.2vh,20px);padding:24px;text-align:center}
-.intro-kicker{font:500 10px var(--fm);letter-spacing:.34em;color:var(--ink-60);text-transform:uppercase}
+  gap:clamp(8px,2vh,20px);padding:20px 16px;text-align:center;overflow:auto}
+.intro-kicker{font:500 10px var(--fm);letter-spacing:.34em;color:var(--ink-60);text-transform:uppercase;
+  max-width:100%;overflow-wrap:anywhere}
 .intro-title{font-family:var(--fd);font-weight:640;line-height:.9;letter-spacing:-.015em;
-  font-size:clamp(3rem,11vw,5.6rem);color:var(--ink)}
+  font-size:clamp(2.5rem,12vw,5.6rem);color:var(--ink)}
 .intro-title .dot{color:var(--red)}
 .intro-sub{font:italic 400 clamp(.95rem,1.6vw,1.05rem)/1.6 var(--fs);color:var(--ink-60);max-width:40ch}
 
 /* amplop: badan + lembar kertas di dalam + tutup + segel */
-.amplop{position:relative;width:min(250px,60vw);aspect-ratio:7/5;border:0;background:transparent;
+.amplop{position:relative;width:min(250px,min(60vw,46vh));aspect-ratio:7/5;border:0;background:transparent;
   cursor:pointer;padding:0;margin-top:clamp(6px,1.5vh,14px);
   -webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .amplop-layar{display:block;position:relative;width:100%;height:100%;perspective:700px;pointer-events:none;
@@ -170,7 +173,15 @@ main.tampak .card{animation:rise .55s cubic-bezier(.2,.8,.3,1) both}
 .draft-flash.show{opacity:1}
 .card-note{margin-top:10px;font:400 9.5px var(--fm);letter-spacing:.1em;line-height:1.7;color:var(--ink-40);text-align:center}
 
-@media(max-height:480px){.amplop{width:min(190px,48vw)}}
+@media(max-height:560px) and (orientation:landscape){
+  .intro{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:10px 26px;padding:16px}
+  .intro-kicker,.intro-sub{width:100%;text-align:center}
+  .intro-title{font-size:clamp(1.9rem,6vw,2.6rem)}
+  .amplop{width:min(170px,34vw)}
+  .amplop-hint{width:100%;text-align:center}
+  .card{padding:10px 22px}
+  .card-head{min-height:42px}
+}
 
 /* layar pendek = rapatkan kartu supaya tombol kirim tetap terlihat */
 @media(max-height:780px){
@@ -256,12 +267,19 @@ main.tampak .card{animation:rise .55s cubic-bezier(.2,.8,.3,1) both}
   border-right:1px solid rgba(34,29,21,.35);border-top:1px solid rgba(34,29,21,.35);transform:rotate(45deg)}
 .env-peek.open .env-ask{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0)}
 @media(max-width:640px){
-  /* membuka ke KIRI amplop — tidak terpotong tepi kanan layar */
-  .env-ask{right:calc(100% + 14px);left:auto;bottom:-24px;top:auto;
-    width:min(250px,calc(100vw - 64px));transform-origin:bottom right}
+  /* dialog jadi fixed di layar kecil — tidak mungkin menjorok keluar layar
+     di device sempit (dulu ke kiri amplop, bisa keluar sampai -43px) */
+  .env-ask{position:fixed;left:16px;right:16px;bottom:84px;top:auto;
+    width:auto;max-width:340px;margin:0 auto;transform:translateY(8px);
+    transform-origin:50% 100%;z-index:700}
+  .env-ask::after{display:none}
+  .env-peek.open .env-ask{transform:translateY(0)}
   .env-peek .env-hint{left:auto;right:0;transform:translateY(-100%)}
   .env-peek:hover .env-hint,.env-peek.open .env-hint{transform:translateY(-110%)}
   .env-label{right:auto;left:-4px;text-align:left}
+}
+@media(max-width:380px){
+  .env-ask{left:12px;right:12px;bottom:76px;max-width:none}
 }
 .env-ask-t{font:600 11.5px var(--fm);letter-spacing:.04em;color:var(--ink);margin-bottom:6px}
 .env-ask-t b{color:var(--red);font-weight:600}
@@ -278,7 +296,7 @@ main.tampak .card{animation:rise .55s cubic-bezier(.2,.8,.3,1) both}
 
 /* ---------------- modal AKAR (segera hadir) ---------------- */
 body.soon-open{overflow:hidden}
-.soon-modal{position:fixed;inset:0;z-index:600;display:flex;align-items:center;justify-content:center;
+.soon-modal{position:fixed;inset:0;z-index:800;display:flex;align-items:center;justify-content:center;
   padding:22px;background:rgba(24,20,16,.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
   opacity:0;visibility:hidden;transition:opacity .25s ease,visibility 0s .25s}
 .soon-modal.show{opacity:1;visibility:visible;transition:opacity .25s ease}
