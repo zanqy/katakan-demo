@@ -36,6 +36,7 @@ body{background:var(--paper);color:var(--ink);font-family:var(--fs);
   background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E")}
 
 /* bilah atas (muncul setelah amplop dibuka) */
+body.sedang-intro{overflow:hidden;height:100dvh}
 .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:16px;
   padding:11px 26px;border-bottom:1px solid var(--line);opacity:0;visibility:hidden;
   font:500 8.5px var(--fm);letter-spacing:.3em;color:var(--ui);text-transform:uppercase}
@@ -105,7 +106,7 @@ body.tetap-terbuka .topbar{opacity:1;visibility:visible;transition:opacity .45s 
 .amplop-hint{font:500 9.5px var(--fm);letter-spacing:.32em;text-transform:lowercase;
   color:var(--ink-60);transition:opacity .3s}
 .intro.dibuka .amplop-hint{opacity:0}
-.intro.pergi{opacity:0;pointer-events:none;transition:opacity .35s ease}
+.intro.pergi{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .3s ease,visibility 0s .32s}
 
 /* ============================================================
    ISI — KARTU SURAT (setelah amplop dibuka)
@@ -168,6 +169,8 @@ main.tampak .card{animation:rise .55s cubic-bezier(.2,.8,.3,1) both}
 .draft-flash{font:italic 500 10px var(--fs);color:var(--red);opacity:0;transition:opacity .35s ease}
 .draft-flash.show{opacity:1}
 .card-note{margin-top:10px;font:400 9.5px var(--fm);letter-spacing:.1em;line-height:1.7;color:var(--ink-40);text-align:center}
+
+@media(max-height:480px){.amplop{width:min(190px,48vw)}}
 
 /* layar pendek = rapatkan kartu supaya tombol kirim tetap terlihat */
 @media(max-height:780px){
@@ -366,7 +369,7 @@ footer a:hover{color:var(--red);border-color:var(--red)}
 <!-- ============ ISI: KARTU SURAT ============ -->
 <div class="topbar">
   <span>MPK · OSIS — <b>KATAKAN.</b></span>
-  <span id="topbarRight">MMXXV · Untuk Sekolah Kita</span>
+  <span id="topbarRight"><a href="https://kotak-aspirasi-osis.vercel.app/" style="color:var(--ink-60)">halaman demo · site asli ↗</a></span>
 </div>
 
 <main id="isi">
@@ -500,16 +503,33 @@ const OFF_HOST=!(['kotak-aspirasi-osis.vercel.app','localhost','127.0.0.1'].some
 
 /* ---------------- intro: klik amplop → surat terbuka ---------------- */
 const intro=$('#intro'),isi=$('#isi'),amplop=$('#amplop'),hint=$('#amplopHint'),topbar=$('.topbar');
+document.body.classList.add('sedang-intro');
+/* satu fungsi, satu keadaan: intro hilang total LALU kartu muncul.
+   Tidak ada crossfade - kalau transisi macet di tengah (tab sempat
+   ke-background), hantu transparan yang menutupi formulir tidak mungkin */
 function tampilkanSurat(){
-  intro.classList.add('pergi');
+  document.body.classList.remove('sedang-intro');
+  intro.style.display='none';
   isi.classList.add('tampak');
   document.body.classList.add('tetap-terbuka');
-  setTimeout(()=>{intro.style.display='none';},REDUCED?60:400);
+}
+let bukaSelesai=false;
+function selesaiBuka(){
+  if(bukaSelesai)return; bukaSelesai=true;
+  tampilkanSurat();
 }
 amplop.addEventListener('click',()=>{
   if(amplop.classList.contains('buka'))return;
   amplop.classList.add('buka');intro.classList.add('dibuka');
-  setTimeout(tampilkanSurat,REDUCED?60:1150);
+  const lembar=document.querySelector('.lembar');
+  if(lembar&&!REDUCED)lembar.addEventListener('transitionend',e=>{
+    if(e.propertyName==='transform')selesaiBuka();
+  },{once:true});
+  setTimeout(selesaiBuka,REDUCED?80:1350);
+});
+/* kalau user sempatkeh pindah aplikasi saat animasi jalan: tuntaskan */
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden&&amplop.classList.contains('buka'))selesaiBuka();
 });
 amplop.addEventListener('keydown',e=>{
   if(e.key==='Enter'||e.key===' '){e.preventDefault();amplop.click();}
